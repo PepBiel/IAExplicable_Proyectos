@@ -1,0 +1,90 @@
+\documentclass[11pt,a4paper]{article}
+
+% ====== Paquetes base ======
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,english]{babel} % Elige el idioma principal abajo
+\selectlanguage{spanish}
+
+\usepackage{lmodern}
+\usepackage{geometry}         % Márgenes
+\geometry{margin=2.5cm}
+
+\usepackage{setspace}         % Espaciado
+\onehalfspacing
+
+\usepackage{graphicx}         % Imágenes
+\graphicspath{{figures/}}     % Carpeta por defecto para figuras
+\usepackage{booktabs}         % Tablas bonitas
+\usepackage{multirow}
+\usepackage{siunitx}          % Alineación de números en tablas
+\sisetup{detect-all}
+
+\usepackage{amsmath,amssymb}  % Matemáticas
+\usepackage{hyperref}         % Enlaces
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+% ====== Bibliografía con biblatex ======
+\usepackage[
+  backend=biber,
+  style=apa,       % puedes usar numeric, ieee, authoryear, etc.
+  sorting=nyt,
+  natbib=true
+]{biblatex}
+\addbibresource{bib/references.bib}
+
+
+
+\usepackage{booktabs,siunitx,tabularx,makecell}
+
+
+\begin{document}
+\begin{titlepage}
+  \thispagestyle{empty}
+  \centering
+
+  \vspace*{\fill} % empuja desde arriba
+
+  {\Huge \textbf{Explainable AI – Unidad 2: Árbol de Decisión (Entrega Primera)}\par}
+  \vspace{1cm}
+
+  {\Large
+  Josep Gabriel Fornes Reynes\\
+  Jordi Florit Ensenyat\\
+  Juan Esteban Rincón Marín\par}
+
+  \vspace{1.2cm}
+
+  {\large Septiembre 2025\par}
+
+  \vspace*{\fill} % empuja hacia abajo
+\end{titlepage}
+
+\clearpage
+
+% ====== Secciones (organizadas en /sections) ======
+\input{sections/01-introduction}
+\input{sections/02-method}
+\input{sections/03-results}
+\input{sections/04-models}
+\input{sections/05-discussion}
+\input{sections/06-conclusion}
+\input{sections/07-references}
+
+% ====== Bibliografía ======
+\printbibliography
+
+% (Opcional) Apéndices
+% \appendix
+% \section{Apéndice: Configuración y reproducibilidad}
+% \input{sections/99-appendix}
+
+\end{document}
