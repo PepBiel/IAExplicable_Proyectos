@@ -146,21 +146,21 @@ El modelo considera que \texttt{desempleo + pocos antecedentes + edad ≤ 36.5} 
 \end{tabular}
 \end{table}
 
-En el subgrupo de desempleados con pocos antecedentes, la condición de ser muy joven (≤ 28.5) lleva al modelo a predecir bajo riesgo (clase 0), en este caso de forma correcta.
+En el subgrupo de desempleados con pocos antecedentes, la condición de ser muy joven ($\leq$ 28.5) lleva al modelo a predecir bajo riesgo (clase 0), en este caso de forma correcta.
 
 % =======================
 % Caso 2 — Verdadero positivo
 % =======================
 \paragraph{Explicación local (Caso 2 — Verdadero positivo)}.
 
-\begin{figure}[h!]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.92\linewidth]{figures/decision_tree_tunned_depth_local2.png}
   \caption{Decision Tree (tuned) local caso 2 con librería \textit{interpret}.}
   \label{fig:tree-tuned_local2}
 \end{figure}
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \caption{Predicción del modelo para el Caso 2.}
 \label{tab:local-pred-caso2}
@@ -174,7 +174,7 @@ En el subgrupo de desempleados con pocos antecedentes, la condición de ser muy 
 \end{tabular}
 \end{table}
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \caption{Ruta de decisión seguida (Caso 2).}
 \label{tab:local-path-caso2}
@@ -240,8 +240,13 @@ La misma subregla que el Caso 1 (joven, pocos antecedentes, desempleado) lleva a
 % Caso 4 — Verdadero negativo
 % =======================
 \paragraph{Explicación local (Caso 4 — Verdadero negativo)}.
-
-\begin{table}[h!]
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/decision_tree_tunned_depth_local4.png}
+  \caption{Decision Tree (tuned) local caso 4 con librería \textit{interpret}.}
+  \label{fig:tree-tuned_local4}
+\end{figure}
+\begin{table}[H]
 \centering
 \caption{Predicción del modelo para el Caso 4.}
 \label{tab:local-pred-caso4}
@@ -255,7 +260,7 @@ La misma subregla que el Caso 1 (joven, pocos antecedentes, desempleado) lleva a
 \end{tabular}
 \end{table}
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \caption{Ruta de decisión seguida (Caso 4).}
 \label{tab:local-path-caso4}
@@ -271,12 +276,6 @@ La misma subregla que el Caso 1 (joven, pocos antecedentes, desempleado) lleva a
 \end{tabular}
 \end{table}
 
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.92\linewidth]{figures/decision_tree_tunned_depth_local4.png}
-  \caption{Decision Tree (tuned) local caso 4 con librería \textit{interpret}.}
-  \label{fig:tree-tuned_local4}
-\end{figure}
 
 El patrón “desempleado, pocos antecedentes, edad baja” vuelve a dar clase 0, esta vez de forma correcta.
 
