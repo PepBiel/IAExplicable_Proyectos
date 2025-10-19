@@ -1,0 +1,25 @@
+\section{Introducción}
+
+\subsection{Resumen del problema y enfoque}
+
+El objetivo de esta entrega es entrenar, comparar y explicar distintos modelos de \textit{Machine Learning} para predecir la variable \texttt{recid}, que indica la reincidencia de un individuo tras una condena. El flujo de trabajo combina un análisis exploratorio inicial, el diseño de un \texttt{Pipeline} reproducible y la evaluación de tres enfoques \textbf{glass-box}: un modelo \textbf{lógico} (árbol de decisión), un modelo \textbf{logístico} (regresión logística) y un modelo \textbf{aditivo} (\textit{Explainable Boosting Machine}, EBM). Cada uno representa una forma diferente de equilibrio entre interpretabilidad y capacidad predictiva. 
+
+El proyecto busca no solo optimizar el rendimiento predictivo, sino también estudiar la \textbf{explicabilidad global y local} de los modelos, analizando cómo cada uno construye sus decisiones y qué variables tienen mayor influencia en el resultado final. 
+
+\subsection{Datos (características y procesamiento)}
+
+Se trabaja con el conjunto \texttt{recidivism.csv}, compuesto por observaciones individuales donde la variable objetivo \texttt{recid} es binaria (reincide / no reincide). El conjunto presenta un equilibrio de clases razonable (relación $\approx$ 1.14 entre clases), y combina variables \textbf{numéricas} (edad, número de antecedentes, delitos juveniles) y \textbf{categóricas} (raza, sexo, tipo de cargo, empleo).
+
+El análisis exploratorio mostró correlaciones moderadas entre las variables (entre --0.2 y +0.3), sin indicios de multicolinealidad. Esto permitió utilizar tanto modelos logísticos como aditivos. Además, el estudio de linealidad evidenció que la edad y el número de antecedentes influyen en la reincidencia de forma no lineal, lo que justificó la incorporación del modelo EBM.
+
+
+El preprocesamiento se encapsuló dentro de un \texttt{Pipeline} que separa variables numéricas (escaladas mediante \texttt{StandardScaler}) y categóricas (codificadas con \texttt{OneHotEncoder}). Se añadió una función personalizada para unificar variables redundantes derivadas de la codificación, generando comparaciones binarias más estables como \texttt{is\_AfricanAmerican\_vs\_Caucasian}, también \texttt{is\_Felony\_vs\_Misdemeanor} y \texttt{is\_Male\_vs\_Female}. De este modo, el pipeline garantiza reproducibilidad, evita \textit{data leakage} y aplica las mismas transformaciones durante entrenamiento y validación.
+
+\subsection{Resultados (visión general)}
+
+Los tres modelos ofrecen perspectivas complementarias sobre el problema.  
+El \textbf{árbol de decisión} baseline sirvió como referencia y, tras el ajuste mediante \texttt{GridSearchCV}, alcanzó una \textbf{accuracy media de 0.719} en validación cruzada, manteniendo buena interpretabilidad y reglas compactas.  
+La \textbf{regresión logística} mostró un rendimiento estable (\textbf{Train = 0.732, 5-fold = 0.702}) y coeficientes consistentes con la interpretación esperada: la edad y el empleo estable reducen la probabilidad de reincidencia, mientras que el número de antecedentes la incrementa.  
+Finalmente, el \textbf{modelo aditivo (EBM)} se consolidó como el más equilibrado del estudio, con un \textbf{Train accuracy de 0.748} y una \textbf{5-fold CV accuracy de 0.723}, logrando la mejor generalización y capturando relaciones no lineales suaves sin perder interpretabilidad.
+
+En conjunto, el EBM mostró la brecha más reducida entre entrenamiento y validación, indicando una excelente capacidad de generalización y manteniendo una explicabilidad global clara (curvas de efecto por variable) y local coherente con las tendencias generales. Esto lo posiciona como el modelo más completo para la predicción y análisis explicable de la reincidencia penal.

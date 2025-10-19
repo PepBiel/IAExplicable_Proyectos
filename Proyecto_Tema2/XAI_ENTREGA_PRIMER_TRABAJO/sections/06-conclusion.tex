@@ -1,0 +1,17 @@
+\section{Conclusión}
+
+El estudio comparó tres modelos explicables para la predicción de reincidencia penal: un árbol de decisión, una regresión logística y un modelo aditivo (Explainable Boosting Machine, EBM). 
+Los resultados muestran que todos alcanzan un rendimiento competitivo, con \textbf{accuracies medias de 0.719, 0.702 y 0.723} respectivamente, manteniendo una buena estabilidad entre entrenamiento y validación. 
+El uso de un pipeline reproducible garantizó coherencia en el preprocesamiento y permitió comparar de forma justa la capacidad predictiva y explicativa de cada enfoque.
+
+A nivel de \textbf{explicabilidad global}, los tres modelos coincidieron en resaltar las mismas variables clave: la situación laboral, el número de antecedentes y la edad. 
+El árbol ofreció una lectura jerárquica y visual a través de reglas de decisión claras, la regresión logística tradujo las relaciones en coeficientes de interpretación directa y el EBM amplió esta visión mediante curvas de efecto que capturan relaciones no lineales con notable claridad. 
+Esta convergencia entre modelos refuerza la fiabilidad de los patrones identificados y demuestra la coherencia del conjunto de datos.
+
+En cuanto a la \textbf{explicabilidad local}, cada modelo aportó una perspectiva complementaria: el árbol permite seguir paso a paso la ruta de decisión de un individuo, la regresión logística descompone las predicciones en contribuciones lineales de cada variable, y el EBM combina ambas visiones, mostrando de forma visual cómo cada factor incrementa o reduce el riesgo individual de reincidencia. 
+Esta capacidad de justificar cada decisión con detalle convierte al EBM en la opción más completa desde el punto de vista explicativo.
+
+En conjunto, los resultados confirman que la transparencia y la precisión pueden coexistir. 
+El árbol destaca por su claridad interpretativa, la regresión logística por su consistencia estadística y el EBM por integrar ambas virtudes, alcanzando el mejor equilibrio entre rendimiento, estabilidad y capacidad explicativa. 
+Por todo ello, el EBM se posiciona como el modelo más sólido del estudio, al lograr unir de forma efectiva la \textbf{precisión predictiva y la explicabilidad}, demostrando que la inteligencia artificial puede ser al mismo tiempo rigurosa y comprensible.
+

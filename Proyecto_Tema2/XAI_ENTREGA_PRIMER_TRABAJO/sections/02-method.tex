@@ -1,0 +1,69 @@
+\section{Metodología}
+
+\subsubsection{Árbol baseline (referencia)}
+Como primer paso se entrena un \texttt{DecisionTreeClassifier} con parámetros por defecto dentro del \texttt{Pipeline}. Este modelo sirve como punto de partida para evaluar dos aspectos fundamentales: (i) si la representación y el preprocesado aplicados permiten al modelo aprender patrones relevantes sin una ingeniería de características adicional, y (ii) cuánto aporta realmente el ajuste de hiperparámetros al rendimiento y la interpretabilidad. 
+
+La elección de un árbol como baseline se justifica por su \textbf{transparencia inmediata} (estructura legible y reglas explícitas) y su bajo coste computacional, lo que facilita validar rápidamente el flujo completo de entrenamiento y evaluación.
+
+\subsubsection{Árbol ajustado (GridSearchCV)}
+En un segundo paso se ajusta el mismo clasificador mediante \texttt{GridSearchCV} con validación cruzada estratificada de 5 particiones. La búsqueda explora hiperparámetros que equilibran la complejidad y la legibilidad del modelo, concretamente:
+
+\begin{itemize}
+  \item \textbf{\texttt{max\_depth}}: limita la profundidad del árbol para evitar sobreajuste.
+  \item \textbf{\texttt{min\_samples\_leaf}} y \textbf{\texttt{min\_samples\_split}}: controlan el tamaño mínimo de las hojas, estabilizando las reglas y mejorando la generalización.
+  \item \textbf{\texttt{criterion} (gini, entropy, log\_loss)}: distintos criterios de impureza; \texttt{log\_loss} produce probabilidades más calibradas, mientras que \texttt{gini}/\texttt{entropy} son más eficientes.
+  \item \textbf{\texttt{max\_features} (None, sqrt, log2)}: actúa como regularizador al limitar el número de atributos por división.
+  \item \textbf{\texttt{splitter} (best, random)}: \texttt{best} busca divisiones deterministas óptimas; \texttt{random} introduce aleatoriedad útil en algunos contextos exploratorios.
+\end{itemize}
+
+El ajuste se integra dentro del \texttt{Pipeline}, garantizando que los mismos pasos de preprocesamiento se apliquen en cada iteración de la validación cruzada, evitando cualquier \textit{data leakage}. Este proceso permite comparar directamente el modelo base y el ajustado en términos de rendimiento y legibilidad, manteniendo la reproducibilidad completa.
+
+\subsubsection{Estudio de linealidad}
+Antes de entrenar los modelos logístico y aditivo, se realiza un estudio de la \textbf{linealidad de las variables} y sus relaciones con la variable objetivo. Para ello se calculan matrices de correlación entre variables numéricas y se representan las relaciones individuales con respecto a \texttt{recid}. 
+
+Este análisis tiene un doble propósito: por un lado, identificar variables cuya relación con el objetivo puede modelarse adecuadamente con un modelo logístico (como la regresión logística), y por otro, detectar aquellas que muestran \textbf{comportamientos no lineales}, donde modelos aditivos como el \textit{GAM/EBM} podrían capturar mejor las tendencias.
+
+\subsubsection{Creación del dataset unificado}
+
+A partir de las conclusiones del estudio de linealidad, se observó que algunas variables presentaban \textbf{alta correlación o redundancia}. En particular, se identificaron pares de variables mutuamente excluyentes, generadas por la codificación \texttt{One-HotEncoder}, que transmitían esencialmente la misma información:
+
+\begin{itemize}
+    \item \texttt{race\_Caucasian} y \texttt{race\_African-American}: una persona afroamericana no es caucásica y viceversa.
+    \item \texttt{c\_charge\_degree\_F} y \texttt{c\_charge\_degree\_M}: el tipo de cargo criminal (felony/misdemeanor) solo puede pertenecer a una de las dos categorías.
+    \item \texttt{sex\_Male} y \texttt{sex\_Female}: igualmente excluyentes entre sí.
+\end{itemize}
+
+Para reducir la redundancia y mejorar la estabilidad de los modelos logísticos y aditivos, se decidió crear un nuevo conjunto de datos aplicando una función de preprocesado personalizada. Esta función elimina una de las columnas redundantes y renombra la restante con una etiqueta más descriptiva, tal como se muestra a continuación:
+
+\begin{itemize}
+    \item \texttt{race\_African-American} $\rightarrow$ \texttt{is\_AfricanAmerican\_vs\_Caucasian}
+    \item \texttt{c\_charge\_degree\_F} $\rightarrow$ \texttt{is\_Felony\_vs\_Misdemeanor}
+    \item \texttt{sex\_Male} $\rightarrow$ \texttt{is\_Male\_vs\_Female}
+\end{itemize}
+
+De esta forma, cada nueva variable representa explícitamente una comparación binaria, simplificando la interpretación de los coeficientes en los modelos logísticos y evitando problemas de multicolinealidad. Este preprocesamiento se integró dentro de un \texttt{Pipeline} mediante un \texttt{FunctionTransformer}, asegurando que las transformaciones se apliquen de manera coherente durante todas las fases de entrenamiento, validación y predicción.
+
+\subsubsection{Modelos logístico y aditivo}
+
+Tras la creación del dataset unificado, se entrenaron los modelos correspondientes a las otras dos familias explicables: el modelo \textbf{logístico} (Regresión Logística) y el modelo \textbf{aditivo} (\textit{Explainable Boosting Machine}, EBM). Ambos se implementaron dentro de \texttt{Pipelines} equivalentes al del árbol, garantizando un flujo de preprocesado homogéneo y validación cruzada estratificada en 5 pliegues.
+
+\begin{itemize}
+  \item \textbf{Modelo logístico (Regresión Logística)}: 
+  este modelo constituye una aproximación sencilla y robusta para problemas de clasificación binaria, en la que la predicción se basa en una combinación lineal de las variables explicativas. 
+  Cada coeficiente representa la contribución (positiva o negativa) de una variable a la probabilidad de reincidencia, lo que permite una interpretación directa y cuantitativa de su influencia.
+  \vspace{3mm}
+
+  En este contexto, la regresión logística sirve como punto de referencia para evaluar hasta qué punto la relación entre las variables del conjunto \texttt{recidivism.csv} puede aproximarse mediante dependencias lineales. Su principal ventaja es la \textbf{transparencia global}: los coeficientes del modelo se pueden ordenar y comparar fácilmente, identificando qué factores aumentan o reducen la probabilidad de reincidencia. Sin embargo, su capacidad para capturar relaciones no lineales o interacciones entre variables es limitada, lo que puede reducir su rendimiento frente a modelos más flexibles.
+
+  \vspace{3mm}
+  \item \textbf{Modelo aditivo (GAM / Explainable Boosting Machine)}:
+  el modelo aditivo generalizado (\textit{Generalized Additive Model}, GAM), que ha sido implementado con la clase \texttt{ExplainableBoostingClassifier} de la librería \texttt{interpret.glassbox}, combina interpretabilidad y capacidad predictiva en una única estructura. A diferencia del modelo logístico, el GAM no asume que las relaciones entre variables y el objetivo sean lineales: cada variable se modela de manera independiente mediante una función de forma libre (no paramétrica), y el resultado final se obtiene sumando los efectos de todas las variables.
+  \vspace{3mm}
+
+  Esta arquitectura permite capturar \textbf{relaciones no lineales suaves} —por ejemplo, umbrales de edad o saturación de efectos por número de antecedentes— sin perder la capacidad de explicar los resultados. Además, los efectos individuales de cada variable pueden visualizarse fácilmente en forma de curvas, lo que aporta una interpretación global clara y comparable con los coeficientes de un modelo logístico.
+  \vspace{3mm}
+
+  En el proyecto se probaron dos variantes: una sin interacciones (GAM puro) y otra con un número limitado de interacciones entre pares de variables (\texttt{interactions}=5). Esta comparación permite analizar el \textbf{compromiso entre simplicidad e incremento de rendimiento}: el modelo con interacciones tiende a captar dependencias más complejas, pero puede volverse menos legible.
+\end{itemize}
+
+Para ambos modelos, el proceso de búsqueda de hiperparámetros incluyó rejillas con variaciones de \texttt{C} y \texttt{penalty} en la regresión logística, y de \texttt{learning\_rate}, \texttt{max\_bins} e \texttt{interactions} en el EBM. En todos los casos se empleó una validación cruzada estratificada de cinco pliegues (\texttt{StratifiedKFold}) para garantizar comparaciones justas entre modelos y evitar sesgos por desbalanceo de clases.
